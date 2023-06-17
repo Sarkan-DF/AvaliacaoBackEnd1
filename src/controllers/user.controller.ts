@@ -48,4 +48,25 @@ export class UserControllers {
       return ApiResponse.serverError(res, error);
     }
   }
+
+  public login(req: Request, res: Response) {
+    try {
+      const { user, password } = req.body;
+
+      const login = bdUser.find((item) => item.user === user);
+      if (!login) {
+        return ApiResponse.invalidCredentials(res);
+      }
+      if (login.password !== password) {
+        return ApiResponse.invalidCredentials(res);
+      }
+
+      return ApiResponse.success(res, "Logim efetuado com sucesso!", {
+        id: login.idUser,
+        name: login.user,
+      });
+    } catch (error: any) {
+      return ApiResponse.serverError(res, error);
+    }
+  }
 }
