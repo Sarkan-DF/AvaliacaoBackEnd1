@@ -6,8 +6,8 @@ import { Request, Response, response } from "express";
 export class UserControllers {
   public create(req: Request, res: Response) {
     try {
-      const { user, password, confirmPassword } = req.body;
-      const users = new User(user, password, confirmPassword);
+      const { email, password, confirmPassword } = req.body;
+      const users = new User(email, password, confirmPassword);
       if (password != confirmPassword) {
         return ApiResponse.badRequest(
           res,
@@ -24,11 +24,11 @@ export class UserControllers {
 
   public list(req: Request, res: Response) {
     try {
-      const { user, password, confirmPassword } = req.query;
+      const { email, password, confirmPassword } = req.query;
       let result = bdUser;
 
-      if (user) {
-        result = bdUser.filter((login) => login.user === user);
+      if (email) {
+        result = bdUser.filter((login) => login.email === email);
       }
 
       if (password) {
@@ -51,9 +51,9 @@ export class UserControllers {
 
   public login(req: Request, res: Response) {
     try {
-      const { user, password } = req.body;
+      const { email, password } = req.body;
 
-      const login = bdUser.find((item) => item.user === user);
+      const login = bdUser.find((item) => item.email === email);
       if (!login) {
         return ApiResponse.invalidCredentials(res);
       }
@@ -62,8 +62,8 @@ export class UserControllers {
       }
 
       return ApiResponse.success(res, "Logim efetuado com sucesso!", {
-        id: login.idUser,
-        name: login.user,
+        idUser: login.idUser,
+        email: login.email,
       });
     } catch (error: any) {
       return ApiResponse.serverError(res, error);

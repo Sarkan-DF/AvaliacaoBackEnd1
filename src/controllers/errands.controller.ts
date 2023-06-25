@@ -40,7 +40,7 @@ export class ErrandsControllers {
 
       return ApiResponse.success(
         res,
-        `Lista de recados do usuario ${existeUsuario.user}`,
+        `Lista de recados do usuario ${existeUsuario.confirmPassword}`,
         existeUsuario.errands.map((user) => user.toJsonE())
       );
     } catch (error: any) {

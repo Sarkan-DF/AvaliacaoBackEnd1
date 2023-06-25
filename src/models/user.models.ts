@@ -6,7 +6,7 @@ export class User {
   public idUser: string;
   private _errands: Errands[];
   constructor(
-    private _user: string,
+    private _email: string,
     private _password: string,
     private _confirmPassword: string
   ) {
@@ -14,8 +14,8 @@ export class User {
     this._errands = [];
   }
 
-  public get user(): string {
-    return this._user;
+  public get email(): string {
+    return this._email;
   }
 
   public get password(): string {
@@ -32,7 +32,7 @@ export class User {
 
   public toJson() {
     return {
-      user: this._user,
+      email: this._email,
       password: this._password,
       confirmPassword: this._confirmPassword,
       idUser: this.idUser,

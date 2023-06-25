@@ -11,7 +11,7 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-app.use("/login", userRoutes());
+app.use("/users", userRoutes());
 
 app.listen(process.env.PORT, () => {
   console.log("API is running...");
