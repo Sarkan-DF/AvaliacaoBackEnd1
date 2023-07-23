@@ -25,8 +25,8 @@ export class UserControllers {
   public list(req: Request, res: Response) {
     try {
       const { email, password, confirmPassword } = req.query;
-      let result = bdUser;
 
+      let result = bdUser;
       if (email) {
         result = bdUser.filter((login) => login.email === email);
       }
