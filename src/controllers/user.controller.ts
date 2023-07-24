@@ -1,43 +1,38 @@
 import { bdUser } from "../database/bdUser";
 import { User } from "../models/user.models";
+import { UserRepository } from "../repositorys/user.repository";
 import { ApiResponse } from "../util/http-response.adapter";
 import { Request, Response, response } from "express";
 
 export class UserControllers {
-  public create(req: Request, res: Response) {
+  public async create(req: Request, res: Response) {
     try {
-      const { email, password, confirmPassword } = req.body;
-      const users = new User(email, password, confirmPassword);
-      if (password != confirmPassword) {
-        return ApiResponse.badRequest(
-          res,
-          "Senha e confirmação de senha devem ser iguais!"
-        );
-      }
-      bdUser.push(users);
+      const { email, password } = req.body;
+      const repository = new UserRepository();
 
-      return ApiResponse.success(res, "Login criado com sucesso!", users);
+      const existeByEmail = await repository.getByEmail(email);
+
+      if (existeByEmail) {
+        return ApiResponse.notProvided(res, "Email já existe no banco!!!");
+      }
+
+      const user = new User(email, password);
+      const result = await repository.create(user);
+
+      return ApiResponse.success(
+        res,
+        "Usuario criado com sucesso!",
+        result.toJson()
+      );
     } catch (error: any) {
       return ApiResponse.serverError(res, error);
     }
   }
 
-  public list(req: Request, res: Response) {
+  public async list(req: Request, res: Response) {
     try {
-      const { email, password, confirmPassword } = req.query;
-
-      let result = bdUser;
-      if (email) {
-        result = bdUser.filter((login) => login.email === email);
-      }
-
-      if (password) {
-        result = bdUser.filter((login) => login.password === password);
-      }
-
-      if (confirmPassword) {
-        result = bdUser.filter((login) => login.confirmPassword === password);
-      }
+      const repository = new UserRepository();
+      const result = await repository.list();
 
       return ApiResponse.success(
         res,
@@ -49,21 +44,30 @@ export class UserControllers {
     }
   }
 
-  public login(req: Request, res: Response) {
+  public async login(req: Request, res: Response) {
     try {
       const { email, password } = req.body;
+      const repository = new UserRepository();
+      const login = await new UserRepository().getByEmail(email);
 
-      const login = bdUser.find((item) => item.email === email);
-      if (!login) {
+      const existeByEmail = await repository.getByEmail(email);
+      const existeByPassword = await repository.getByPassword(password);
+
+      if (!existeByEmail || !existeByPassword) {
         return ApiResponse.invalidCredentials(res);
       }
-      if (login.password !== password) {
-        return ApiResponse.invalidCredentials(res);
-      }
+
+      // const login = bdUser.find((item) => item.email === email);
+      // if (!login) {
+      //   return ApiResponse.invalidCredentials(res);
+      // }
+      // if (login.password !== password) {
+      //   return ApiResponse.invalidCredentials(res);
+      // }
 
       return ApiResponse.success(res, "Logim efetuado com sucesso!", {
-        idUser: login.idUser,
-        email: login.email,
+        idUser: login?.idUser,
+        email: login?.email,
       });
     } catch (error: any) {
       return ApiResponse.serverError(res, error);

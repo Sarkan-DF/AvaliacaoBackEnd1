@@ -8,11 +8,11 @@ import {
 
 @Entity("user")
 export class UserEntity {
-  @PrimaryColumn({ type: "uuid" })
-  id: string;
+  @PrimaryColumn({ name: "id_user", type: "uuid" })
+  idUser: string;
 
   @Column()
-  email: String;
+  email: string;
 
   @Column()
   password: string;
