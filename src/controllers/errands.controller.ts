@@ -1,27 +1,39 @@
 import { bdUser } from "../database/bdUser";
 import { Errands } from "../models/errands.models";
 import { User } from "../models/user.models";
+import { ErradsReposity } from "../repositorys/errand.repository";
+import { UserRepository } from "../repositorys/user.repository";
 import { ApiResponse } from "../util/http-response.adapter";
 import { Request, Response, response } from "express";
 
 export class ErrandsControllers {
-  public create(req: Request, res: Response) {
+  public async create(req: Request, res: Response) {
     try {
       const { iduser } = req.params;
       const { title, description } = req.body;
+      const repositoryUser = new UserRepository();
+      const repositoryErrand = new ErradsReposity();
 
-      const existeUsuario = bdUser.find((login) => login.idUser === iduser);
-      if (!existeUsuario) {
-        return ApiResponse.notFound(res, "Usuario");
+      const user = await repositoryUser.getById(iduser);
+
+      if (!user) {
+        return ApiResponse.notFound(res, "Usuario não encontrado!");
       }
 
-      const errand = new Errands(title, description);
-      existeUsuario.errands.push(errand);
+      const errand = new Errands(title, description, user);
+      const result = await repositoryErrand.create(errand);
+      // const existeUsuario = bdUser.find((login) => login.idUser === iduser);
+      // if (!existeUsuario) {
+      //   return ApiResponse.notFound(res, "Usuario");
+      // }
+
+      // const errand = new Errands(title, description);
+      // existeUsuario.errands.push(errand);
 
       return ApiResponse.success(
         res,
         "Recado Criado com sucesso",
-        existeUsuario.errands[existeUsuario.errands.length - 1].toJsonE()
+        result.toJsonE
       );
     } catch (error: any) {
       return ApiResponse.serverError(res, error);
@@ -40,7 +52,7 @@ export class ErrandsControllers {
 
       return ApiResponse.success(
         res,
-        `Lista de recados do usuario ${existeUsuario.confirmPassword}`,
+        `Lista de recados do usuario ${existeUsuario.password}`,
         existeUsuario.errands.map((user) => user.toJsonE())
       );
     } catch (error: any) {

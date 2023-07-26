@@ -1,4 +1,3 @@
-import { bdUser } from "../database/bdUser";
 import { User } from "../models/user.models";
 import { UserRepository } from "../repositorys/user.repository";
 import { ApiResponse } from "../util/http-response.adapter";
@@ -56,14 +55,6 @@ export class UserControllers {
       if (!existeByEmail || !existeByPassword) {
         return ApiResponse.invalidCredentials(res);
       }
-
-      // const login = bdUser.find((item) => item.email === email);
-      // if (!login) {
-      //   return ApiResponse.invalidCredentials(res);
-      // }
-      // if (login.password !== password) {
-      //   return ApiResponse.invalidCredentials(res);
-      // }
 
       return ApiResponse.success(res, "Logim efetuado com sucesso!", {
         idUser: login?.idUser,

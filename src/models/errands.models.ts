@@ -1,10 +1,16 @@
 // import { v4 as createUuid2 } from "uuid";
 
 import { randomUUID } from "crypto";
+import { ErrandEntity } from "../database/entities/errand.entity";
+import { User } from "./user.models";
 
 export class Errands {
   public idErrands: string;
-  constructor(private _title: string, private _description: string) {
+  constructor(
+    private _title: string,
+    private _description: string,
+    private _user: User
+  ) {
     this.idErrands = randomUUID();
   }
 
@@ -24,11 +30,23 @@ export class Errands {
     this._description = description;
   }
 
+  public get user(): User {
+    return this._user;
+  }
+
   public toJsonE() {
     return {
+      idErrands: this.idErrands,
       title: this._title,
       description: this._description,
-      idErrands: this.idErrands,
+      user: this._user?.toJson(),
     };
+  }
+
+  public static create(row: ErrandEntity, user: User) {
+    const errand = new Errands(row.title, row.description, user);
+    errand.idErrands = row.idErrands;
+
+    return errand;
   }
 }
