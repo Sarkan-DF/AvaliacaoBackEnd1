@@ -3,31 +3,48 @@ import { ErrandEntity } from "../database/entities/errand.entity";
 import { Errands } from "../models/errands.models";
 import { UserRepository } from "./user.repository";
 
+interface ListTransactionsParams {
+  idUser: string;
+}
 export class ErradsReposity {
-  private connection = Database.connection.getRepository(ErrandEntity);
+  private repository = Database.connection.getRepository(ErrandEntity);
 
   public async create(errand: Errands) {
-    const ErrandEntity = this.connection.create({
+    const ErrandEntity = await this.repository.create({
       idErrands: errand.idErrands,
       title: errand.title,
       description: errand.description,
+      idUser: errand.user.idUser,
     });
 
-    const result = await this.connection.save(ErrandEntity);
-    return ErradsReposity.mapRowToModel(result);
+    await this.repository.save(ErrandEntity);
+    const result = await this.repository.findOne({
+      where: { idErrands: errand.idErrands },
+      relations: { user: true },
+    });
+    return this.mapRowToModel(result!);
+  }
+
+  public async list(paramas: ListTransactionsParams) {
+    const result = await this.repository.find({
+      where: { idUser: paramas.idUser },
+      relations: { user: true },
+    });
+
+    return result.map((row) => this.mapRowToModel(row));
   }
 
   public async getByIdUser(idUser: string) {
-    const result = await this.connection.findOneBy({ idUser });
+    const result = await this.repository.findOneBy({ idUser });
 
     if (!result) {
       return undefined;
     }
 
-    return ErradsReposity.mapRowToModel(result);
+    return this.mapRowToModel(result);
   }
 
-  public static mapRowToModel(entity: ErrandEntity) {
+  public mapRowToModel(entity: ErrandEntity) {
     const user = UserRepository.mapRowToModel(entity.user);
     return Errands.create(entity, user);
   }

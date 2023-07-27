@@ -11,49 +11,41 @@ export class ErrandsControllers {
     try {
       const { iduser } = req.params;
       const { title, description } = req.body;
-      const repositoryUser = new UserRepository();
-      const repositoryErrand = new ErradsReposity();
 
-      const user = await repositoryUser.getById(iduser);
+      const user = await new UserRepository().getById(iduser);
 
       if (!user) {
         return ApiResponse.notFound(res, "Usuario não encontrado!");
       }
 
       const errand = new Errands(title, description, user);
-      const result = await repositoryErrand.create(errand);
-      // const existeUsuario = bdUser.find((login) => login.idUser === iduser);
-      // if (!existeUsuario) {
-      //   return ApiResponse.notFound(res, "Usuario");
-      // }
-
-      // const errand = new Errands(title, description);
-      // existeUsuario.errands.push(errand);
+      const result = await new ErradsReposity().create(errand);
 
       return ApiResponse.success(
         res,
         "Recado Criado com sucesso",
-        result.toJsonE
+        result.toJsonE()
       );
     } catch (error: any) {
       return ApiResponse.serverError(res, error);
     }
   }
 
-  public list(req: Request, res: Response) {
+  public async list(req: Request, res: Response) {
     try {
       const { iduser } = req.params;
-      const { title, description } = req.query;
+      const user = await new UserRepository().getById(iduser);
 
-      const existeUsuario = bdUser.find((user) => user.idUser === iduser);
-      if (!existeUsuario?.errands) {
-        return ApiResponse.notFound(res, `Recado do usuario não encontrado!`);
+      if (!user) {
+        return ApiResponse.notFound(res, "Usuario não encontrado!");
       }
+
+      const errand = await new ErradsReposity().list({ idUser: iduser });
 
       return ApiResponse.success(
         res,
-        `Lista de recados do usuario ${existeUsuario.password}`,
-        existeUsuario.errands.map((user) => user.toJsonE())
+        `Lista de recados do usuario ${user.email}`,
+        errand.map((user) => user.toJsonE())
       );
     } catch (error: any) {
       return ApiResponse.serverError(res, error);
