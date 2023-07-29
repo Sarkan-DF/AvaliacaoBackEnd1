@@ -1,6 +1,8 @@
+import { title } from "process";
 import { Database } from "../database/config/database.conection";
 import { ErrandEntity } from "../database/entities/errand.entity";
 import { Errands } from "../models/errands.models";
+import { User } from "../models/user.models";
 import { UserRepository } from "./user.repository";
 
 interface ListTransactionsParams {
@@ -25,17 +27,39 @@ export class ErradsReposity {
     return this.mapRowToModel(result!);
   }
 
-  public async list(paramas: ListTransactionsParams) {
+  public async list(params: ListTransactionsParams) {
     const result = await this.repository.find({
-      where: { idUser: paramas.idUser },
+      where: { idUser: params.idUser },
       relations: { user: true },
     });
 
     return result.map((row) => this.mapRowToModel(row));
   }
 
-  public async getByIdUser(idUser: string) {
-    const result = await this.repository.findOneBy({ idUser });
+  public async delete(idErrands: string) {
+    const result = await this.repository.delete({
+      idErrands,
+    });
+
+    return result.affected ?? 0;
+  }
+
+  public async update(errand: Errands) {
+    await this.repository.update(
+      {
+        idErrands: errand.idErrands,
+      },
+      {
+        title: errand.title,
+        description: errand.description,
+      }
+    );
+  }
+
+  public async getByIdErrand(idErrands: string) {
+    const result = await this.repository.findOneBy({
+      idErrands: idErrands,
+    });
 
     if (!result) {
       return undefined;

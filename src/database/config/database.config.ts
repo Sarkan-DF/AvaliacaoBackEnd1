@@ -5,7 +5,7 @@ dotenv.config();
 
 const dataSource = new DataSource({
   type: "postgres",
-  port: 3333,
+  port: 8080,
   host: process.env.DB_HOST,
   username: process.env.DB_USER,
   database: process.env.DB_NAME,
