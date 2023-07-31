@@ -96,10 +96,9 @@ export class ErrandsControllers {
       const errand = await errandRepository.getByIdErrand(iderrands);
 
       if (!errand) {
-        ApiResponse.notFound(res, "Recado");
+        return ApiResponse.notFound(res, "Recado");
       }
 
-      // errand mesmo validado diz que pode ser undefind
       if (title) {
         errand.title = title;
       }

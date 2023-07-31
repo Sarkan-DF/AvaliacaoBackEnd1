@@ -57,8 +57,11 @@ export class ErradsReposity {
   }
 
   public async getByIdErrand(idErrands: string) {
-    const result = await this.repository.findOneBy({
-      idErrands: idErrands,
+    const result = await this.repository.findOne({
+      where: {
+        idErrands,
+      },
+      relations: ["user"],
     });
 
     if (!result) {
